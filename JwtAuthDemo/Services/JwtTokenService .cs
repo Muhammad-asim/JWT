@@ -1,4 +1,7 @@
-﻿namespace JwtAuthDemo.Services
+﻿using JwtAuthDemo.Model;
+using System.Security.Claims;
+
+namespace JwtAuthDemo.Services
 {
     public class JwtTokenService : IJwtTokenService
     {
@@ -8,13 +11,23 @@
         {
             _configuration = configuration;
         }
-        public string GenerateToken(string username)
+        public string GenerateToken(string username, string role)
         {
-          var claims = new[]
-          {
-              new System.Security.Claims.Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, username),
-              new System.Security.Claims.Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            //var claims = new[]
+            //{
+            //    new System.Security.Claims.Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub, username),
+            //    new System.Security.Claims.Claim(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            //};
+            var claims = new[]
+            {
+
+                new Claim(ClaimTypes.Name , username), 
+                new Claim(ClaimTypes.Role , "Admin") ,               
+                new Claim(ClaimTypes.Role , "Manager"), 
+                new Claim(ClaimTypes.Role , "User"), 
+
           };
+
             var key = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new Microsoft.IdentityModel.Tokens.SigningCredentials(key, Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256);
             var token = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(
@@ -24,6 +37,22 @@
                 expires: DateTime.Now.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
                 signingCredentials: creds);
             return new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public RefreshToken GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return new RefreshToken
+                {
+                    Token = Convert.ToBase64String(randomNumber),
+                    Expires = _configuration["Jwt:RefreshTokenDays"] is not null
+                        ? DateTime.Now.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenDays"]))
+                        : DateTime.Now.AddDays(7) // Default to 7 days if not configured
+                };
+            }
         }
     }
 }
