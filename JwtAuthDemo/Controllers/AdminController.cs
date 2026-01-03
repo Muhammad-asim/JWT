@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JwtAuthDemo.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("api/admin")]
     public class AdminController : ControllerBase
