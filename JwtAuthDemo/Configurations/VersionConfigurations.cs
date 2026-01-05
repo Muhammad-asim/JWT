@@ -98,9 +98,6 @@ namespace JwtAuthDemo.Configurations
         }
     }
 
-    /// <summary>
-    /// Version 1.0 specific configurations
-    /// </summary>
     public static class Version1Configurations
     {
         /// <summary>
@@ -131,9 +128,7 @@ namespace JwtAuthDemo.Configurations
     /// </summary>
     public static class Version2Configurations
     {
-        /// <summary>
-        /// Configures services specific to API Version 2.0
-        /// </summary>
+     
         public static IServiceCollection AddVersion2Services(this IServiceCollection services)
         {
             // Add version 2.0 specific services here
