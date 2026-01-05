@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JwtAuthDemo.Controllers
+namespace JwtAuthDemo.Controllers.V1
 {
     [Authorize(Roles = "Admin")]
     [ApiController]
-    [Route("api/admin")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/admin")]
     public class AdminController : ControllerBase
     {
         [HttpGet("dashboard")]
