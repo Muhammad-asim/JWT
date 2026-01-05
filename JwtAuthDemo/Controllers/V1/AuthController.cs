@@ -1,11 +1,14 @@
+using Asp.Versioning;
 using JwtAuthDemo.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace JwtAuthDemo.Controllers
+namespace JwtAuthDemo.Controllers.V1
 {
     [ApiController]
-    [Route("api/auth")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IJwtTokenService _jwtService;
