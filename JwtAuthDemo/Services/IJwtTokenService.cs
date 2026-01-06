@@ -1,4 +1,5 @@
-﻿using JwtAuthDemo.Model;
+﻿using JwtAuthDemo.Data;
+using JwtAuthDemo.Model;
 using Microsoft.AspNetCore.Identity;
 
 namespace JwtAuthDemo.Services

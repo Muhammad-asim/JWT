@@ -35,12 +35,12 @@ This roadmap is organized by priority and impact, helping guide development effo
 **Effort:** Medium
 
 **Tasks:**
-- [ ] Create RefreshToken entity with database storage
-- [ ] Implement refresh token service
-- [ ] Complete refresh endpoint with validation
-- [ ] Add token rotation (revoke old, issue new)
-- [ ] Implement token revocation endpoint
-- [ ] Add cleanup job for expired tokens
+- [x] Create RefreshToken entity with database storage
+- [x] Implement refresh token service
+- [x] Complete refresh endpoint with validation
+- [x] Add token rotation (revoke old, issue new)
+- [x] Implement token revocation endpoint
+- [] Add cleanup job for expired tokens
 
 **Benefits:**
 - Proper token lifecycle management

@@ -1,5 +1,5 @@
 using Asp.Versioning;
-using JwtAuthDemo.Services;
+using JwtAuthDemo.Services.V2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -52,7 +52,7 @@ namespace JwtAuthDemo.Controllers.V2
             {
                 await _userManager.AddToRoleAsync(user, "User");
                 _logger.LogInformation("User {Email} registered successfully", request.Email);
-                
+
                 return Ok(new RegisterResponse
                 {
                     Success = true,
@@ -79,6 +79,8 @@ namespace JwtAuthDemo.Controllers.V2
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
@@ -95,9 +97,8 @@ namespace JwtAuthDemo.Controllers.V2
             {
                 var roles = await _userManager.GetRolesAsync(user);
                 var accessToken = _jwtService.GenerateToken(user, roles);
-                var refreshToken = _jwtService.GenerateRefreshToken();
+                var refreshToken = await _jwtService.GenerateRefreshToken(user.Id, ip);
 
-                // TODO: Save refresh token in DB against user
 
                 Response.Cookies.Append("access_token", accessToken, new CookieOptions
                 {
@@ -133,20 +134,38 @@ namespace JwtAuthDemo.Controllers.V2
         [HttpPost("refresh")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public IActionResult Refresh([FromBody] RefreshTokenRequest request)
+        public async Task<IActionResult> RefreshAsync([FromBody] RefreshTokenRequest request)
         {
             // TODO:
             // 1. Validate refresh token from DB
             // 2. Check expiry
             // 3. Generate new access token
 
-            var newAccessToken = _jwtService.GenerateRefreshToken();
 
-            return Ok(new RefreshTokenResponse
+
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+            var newRefreshToken = await _jwtService.RotateAsync(request.RefreshToken, ip);
+            if (newRefreshToken == null)
+                return Unauthorized("Invalid refresh token");
+
+            var accessToken = _jwtService.GenerateRefreshToken(newRefreshToken.User.Id , ip);
+
+            return Ok(new
             {
-                Success = true,
-                AccessToken = newAccessToken.Token
+                accessToken,
+                refreshToken = newRefreshToken.Token
             });
+        }
+
+        [HttpPost("revoke")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> RevokeAsync([FromBody] RefreshTokenRequest request)
+        {
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+             await _jwtService.InvalidateRefreshTokenAsync(request.RefreshToken, ip);
+            return Ok(new { message = "Refresh token revoked" });
         }
     }
 

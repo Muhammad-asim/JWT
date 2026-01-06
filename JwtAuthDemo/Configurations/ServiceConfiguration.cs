@@ -13,7 +13,7 @@ namespace JwtAuthDemo.Configurations
         /// </summary>
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddScoped<IJwtTokenService, JwtTokenService>();
+            //services.AddScoped<IJwtTokenService, JwtTokenService>();
 
             return services;
         }

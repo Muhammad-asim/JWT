@@ -1,5 +1,7 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using JwtAuthDemo.Services;
+using JwtAuthDemo.Services.V2;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -107,7 +109,7 @@ namespace JwtAuthDemo.Configurations
         {
             // Add version 1.0 specific services here
             // For example: services.AddScoped<IV1Service, V1Service>();
-            
+            services.AddScoped<Services.IJwtTokenService,Services.JwtTokenService>();
             return services;
         }
 
@@ -133,6 +135,7 @@ namespace JwtAuthDemo.Configurations
         {
             // Add version 2.0 specific services here
             // For example: services.AddScoped<IV2Service, V2Service>();
+            services.AddScoped<Services.V2.IJwtTokenService,Services.V2.JwtTokenService>();
             
             return services;
         }

@@ -1,4 +1,5 @@
-﻿using JwtAuthDemo.Model;
+﻿using JwtAuthDemo.Data;
+using JwtAuthDemo.Model;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
@@ -60,7 +61,7 @@ namespace JwtAuthDemo.Services
                 return new RefreshToken
                 {
                     Token = Convert.ToBase64String(randomNumber),
-                    Expires = _configuration["Jwt:RefreshTokenDays"] is not null
+                    ExpiresAt = _configuration["Jwt:RefreshTokenDays"] is not null
                         ? DateTime.Now.AddDays(Convert.ToDouble(_configuration["Jwt:RefreshTokenDays"]))
                         : DateTime.Now.AddDays(7) // Default to 7 days if not configured
                 };
